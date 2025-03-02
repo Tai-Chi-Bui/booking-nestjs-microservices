@@ -21,7 +21,7 @@ export class DataSeeder {
           name: 'developer',
           email: 'dev@dev.com',
           password: await encryptPassword('Admin@12345'),
-          role: Role.ADMIN,
+          role: 'admin' as any,
           passportNumber: '12345678',
           isEmailVerified: true
         })

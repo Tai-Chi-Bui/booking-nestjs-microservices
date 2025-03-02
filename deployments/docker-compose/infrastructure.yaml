@@ -1,0 +1,62 @@
+version: "3.3"
+services:
+  #######################################################
+  #  Rabbitmq
+  #######################################################
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management
+    restart: unless-stopped
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - booking
+
+    #######################################################
+    #  Postgress
+    #######################################################
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./docker-postgresql-multiple-databases.sh:/docker-entrypoint-initdb.d/docker-postgresql-multiple-databases.sh
+    networks:
+      - booking
+
+      #######################################################
+      #  Jaeger
+      #######################################################
+  jaeger:
+    container_name: jaeger
+    image: jaegertracing/all-in-one:latest
+    restart: unless-stopped
+    ports:
+      - 16686:16686 # Jaeger UI
+      - 14250:14250 # Model used by jaeger-agent to send spans to jaeger-collector
+      - 14268:14268 # can accept spans directly from clients in jaeger.thrift format
+      - 14269:14269 # Admin port: health check at / and metrics at /metrics
+    networks:
+      - booking
+
+    #######################################################
+    #  Zipkin
+    #######################################################
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin:latest
+    restart: unless-stopped
+    ports:
+      - "9411:9411"
+    networks:
+      - booking
+
+networks:
+  booking:
+    driver: bridge
